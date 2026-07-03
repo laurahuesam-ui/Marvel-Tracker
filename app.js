@@ -1,238 +1,239 @@
-const STORAGE_KEY = 'marvelTrackerData.v3';
+const STORAGE_KEY = 'marvel-tracker-v1';
 
 const seedItems = [
-  ['Phase 1','movie','Iron Man','2008',126,'https://www.imdb.com/title/tt0371746/'],
-  ['Phase 1','movie','Der unglaubliche Hulk','2008',112,'https://www.imdb.com/title/tt0800080/'],
-  ['Phase 1','movie','Iron Man 2','2010',124,'https://www.imdb.com/title/tt1228705/'],
-  ['Phase 1','movie','Thor','2011',115,'https://www.imdb.com/title/tt0800369/'],
-  ['Phase 1','movie','Captain America: The First Avenger','2011',124,'https://www.imdb.com/title/tt0458339/'],
-  ['Phase 1','movie','Marvel’s The Avengers','2012',143,'https://www.imdb.com/title/tt0848228/'],
-  ['Phase 2','movie','Iron Man 3','2013',130,'https://www.imdb.com/title/tt1300854/'],
-  ['Phase 2','movie','Thor – The Dark Kingdom','2013',112,'https://www.imdb.com/title/tt1981115/'],
-  ['Phase 2','movie','The Return of the First Avenger','2014',136,'https://www.imdb.com/title/tt1843866/'],
-  ['Phase 2','movie','Guardians of the Galaxy','2014',121,'https://www.imdb.com/title/tt2015381/'],
-  ['Phase 2','series','Daredevil Staffel 1','2015',54,'https://www.imdb.com/title/tt3322312/episodes/?season=1',13],
-  ['Phase 2','movie','Avengers: Age of Ultron','2015',141,'https://www.imdb.com/title/tt2395427/'],
-  ['Phase 2','movie','Ant-Man','2015',117,'https://www.imdb.com/title/tt0478970/'],
-  ['Phase 2','series','Jessica Jones Staffel 1','2015',52,'https://www.imdb.com/title/tt2357547/episodes/?season=1',13],
-  ['Phase 3','series','Daredevil Staffel 2','2016',54,'https://www.imdb.com/title/tt3322312/episodes/?season=2',13],
-  ['Phase 3','movie','The First Avenger: Civil War','2016',147,'https://www.imdb.com/title/tt3498820/'],
-  ['Phase 3','series','Luke Cage Staffel 1','2016',55,'https://www.imdb.com/title/tt3322314/episodes/?season=1',13],
-  ['Phase 3','movie','Doctor Strange','2016',115,'https://www.imdb.com/title/tt1211837/'],
-  ['Phase 3','series','Iron Fist Staffel 1','2017',55,'https://www.imdb.com/title/tt3322310/episodes/?season=1',13],
-  ['Phase 3','movie','Guardians of the Galaxy Vol. 2','2017',136,'https://www.imdb.com/title/tt3896198/'],
-  ['Phase 3','movie','Spider-Man: Homecoming','2017',133,'https://www.imdb.com/title/tt2250912/'],
-  ['Phase 3','series','The Defenders','2017',50,'https://www.imdb.com/title/tt4230076/episodes/',8],
-  ['Phase 3','movie','Thor: Tag der Entscheidung','2017',130,'https://www.imdb.com/title/tt3501632/'],
-  ['Phase 3','series','The Punisher Staffel 1','2017',53,'https://www.imdb.com/title/tt5675620/episodes/?season=1',13],
-  ['Phase 3','movie','Black Panther','2018',134,'https://www.imdb.com/title/tt1825683/'],
-  ['Phase 3','series','Jessica Jones Staffel 2','2018',52,'https://www.imdb.com/title/tt2357547/episodes/?season=2',13],
-  ['Phase 3','movie','Avengers: Infinity War','2018',149,'https://www.imdb.com/title/tt4154756/'],
-  ['Phase 3','movie','Ant-Man and the Wasp','2018',118,'https://www.imdb.com/title/tt5095030/'],
-  ['Phase 3','series','Luke Cage Staffel 2','2018',55,'https://www.imdb.com/title/tt3322314/episodes/?season=2',13],
-  ['Phase 3','series','Iron Fist Staffel 2','2018',55,'https://www.imdb.com/title/tt3322310/episodes/?season=2',10],
-  ['Phase 3','series','Daredevil Staffel 3','2018',54,'https://www.imdb.com/title/tt3322312/episodes/?season=3',13],
-  ['Phase 3','series','The Punisher Staffel 2','2019',53,'https://www.imdb.com/title/tt5675620/episodes/?season=2',13],
-  ['Phase 3','movie','Captain Marvel','2019',123,'https://www.imdb.com/title/tt4154664/'],
-  ['Phase 3','movie','Avengers: Endgame','2019',181,'https://www.imdb.com/title/tt4154796/'],
-  ['Phase 3','series','Jessica Jones Staffel 3','2019',52,'https://www.imdb.com/title/tt2357547/episodes/?season=3',13],
-  ['Phase 3','movie','Spider-Man: Far From Home','2019',129,'https://www.imdb.com/title/tt6320628/'],
-  ['Phase 4','series','WandaVision','2021',35,'https://www.imdb.com/title/tt9140560/episodes/',9],
-  ['Phase 4','series','The Falcon and the Winter Soldier','2021',50,'https://www.imdb.com/title/tt9208876/episodes/',6],
-  ['Phase 4','series','Loki Staffel 1','2021',50,'https://www.imdb.com/title/tt9140554/episodes/?season=1',6],
-  ['Phase 4','movie','Black Widow','2021',134,'https://www.imdb.com/title/tt3480822/'],
-  ['Phase 4','series','Marvel’s What If…? Staffel 1','2021',32,'https://www.imdb.com/title/tt10168312/episodes/?season=1',9],
-  ['Phase 4','movie','Shang-Chi: And the Legend of the Ten Rings','2021',132,'https://www.imdb.com/title/tt9376612/'],
-  ['Phase 4','movie','Eternals','2021',156,'https://www.imdb.com/title/tt9032400/'],
-  ['Phase 4','series','Hawkeye','2021',48,'https://www.imdb.com/title/tt10160804/episodes/',6],
-  ['Phase 4','movie','Spider-Man: No Way Home','2021',148,'https://www.imdb.com/title/tt10872600/'],
-  ['Phase 4','series','Moon Knight','2022',47,'https://www.imdb.com/title/tt10234724/episodes/',6],
-  ['Phase 4','movie','Doctor Strange in the Multiverse of Madness','2022',126,'https://www.imdb.com/title/tt9419884/'],
-  ['Phase 4','series','Ms. Marvel','2022',47,'https://www.imdb.com/title/tt10857164/episodes/',6],
-  ['Phase 4','movie','Thor: Love and Thunder','2022',118,'https://www.imdb.com/title/tt10648342/'],
-  ['Phase 4','series','Ich bin Groot Staffel 1','2022',5,'https://www.imdb.com/title/tt13623148/episodes/?season=1',5],
-  ['Phase 4','series','She-Hulk: Die Anwältin','2022',34,'https://www.imdb.com/title/tt10857160/episodes/',9],
-  ['Phase 4','special','Werewolf by Night','2022',53,'https://www.imdb.com/title/tt15318872/'],
-  ['Phase 4','movie','Black Panther: Wakanda Forever','2022',161,'https://www.imdb.com/title/tt9114286/'],
-  ['Phase 4','special','Guardians of the Galaxy Holiday Special','2022',42,'https://www.imdb.com/title/tt13623136/'],
-  ['Phase 5','movie','Ant-Man and the Wasp: Quantumania','2023',124,'https://www.imdb.com/title/tt10954600/'],
-  ['Phase 5','movie','Guardians of the Galaxy Vol. 3','2023',150,'https://www.imdb.com/title/tt6791350/'],
-  ['Phase 5','series','Secret Invasion','2023',47,'https://www.imdb.com/title/tt13157618/episodes/',6],
-  ['Phase 5','series','Ich bin Groot Staffel 2','2023',5,'https://www.imdb.com/title/tt13623148/episodes/?season=2',5],
-  ['Phase 5','series','Loki Staffel 2','2023',50,'https://www.imdb.com/title/tt9140554/episodes/?season=2',6],
-  ['Phase 5','movie','The Marvels','2023',105,'https://www.imdb.com/title/tt10676048/'],
-  ['Phase 5','series','Marvel’s What If…? Staffel 2','2023',32,'https://www.imdb.com/title/tt10168312/episodes/?season=2',9],
-  ['Phase 5','series','Echo','2024',42,'https://www.imdb.com/title/tt13966962/episodes/',5],
-  ['Phase 5','movie','Deadpool & Wolverine','2024',128,'https://www.imdb.com/title/tt6263850/'],
-  ['Phase 5','series','Agatha All Along','2024',41,'https://www.imdb.com/title/tt15571732/episodes/',9],
-  ['Phase 5','series','Marvel’s What If…? Staffel 3','2024',32,'https://www.imdb.com/title/tt10168312/episodes/?season=3',8],
-  ['Phase 5','series','Der freundliche Spider-Man aus der Nachbarschaft','2025',29,'https://www.imdb.com/title/tt16027074/episodes/',10],
-  ['Phase 5','movie','Captain America: Brave New World','2025',118,'https://www.imdb.com/title/tt14513804/'],
-  ['Phase 5','series','Daredevil: Born Again Staffel 1','2025',47,'https://www.imdb.com/title/tt18923754/episodes/?season=1',9],
-  ['Phase 5','movie','Thunderbolts*','2025',127,'https://www.imdb.com/title/tt20969586/'],
-  ['Phase 5','series','Ironheart','2025',45,'https://www.imdb.com/title/tt13623126/episodes/',6],
-  ['Phase 6','movie','The Fantastic Four: First Steps','2025',115,'https://www.imdb.com/title/tt10676052/'],
-  ['Phase 6','series','Eyes of Wakanda','2025',30,'https://www.imdb.com/title/tt32695408/',4],
-  ['Phase 6','series','Marvel Zombies','2025',30,'https://www.imdb.com/title/tt16027014/',4],
-  ['Phase 6','series','Wonder Man','28.01.2026',0,'https://www.imdb.com/title/tt11206616/',0],
-  ['Phase 6','series','Daredevil: Born Again Staffel 2','28.01.2026',0,'https://www.imdb.com/title/tt18923754/episodes/',0],
-  ['Phase 6','special','The Punisher: One Last Kill','13.05.2026',0,'',0],
-  ['Phase 6','movie','Spider-Man: Brand New Day','30.07.2026',0,'https://www.imdb.com/title/tt22084616/'],
-  ['Phase 6','series','VisionQuest','14.10.2026',0,'https://www.imdb.com/title/tt18117932/',0],
-  ['Phase 6','movie','Avengers: Doomsday','16.12.2026',0,'https://www.imdb.com/title/tt21357150/'],
-  ['Phase 6','movie','Avengers: Secret Wars','15.12.2027',0,'https://www.imdb.com/title/tt21361444/'],
-  ['Phase 7','movie','Unbekannter Film','17.02.2028',0,''],
-  ['Phase 7','movie','Unbekannter Film','04.05.2028',0,''],
-  ['Phase 7','movie','Unbekannter Film','09.11.2028',0,''],
-  ['Phase 7','movie','Unbekannter Film','14.12.2028',0,''],
-  ['Ohne Start','movie','Armor Wars','unbekannt',0,'https://www.imdb.com/title/tt13623128/'],
-  ['Ohne Start','movie','Shang-Chi 2','unbekannt',0,''],
-  ['Ohne Start','movie','Blade','unbekannt',0,'https://www.imdb.com/title/tt10671440/'],
-  ['Ohne Start','series','Nova','unbekannt',0,'',0],
-  ['Ohne Start','movie','Black Panther 3','unbekannt',0,''],
-  ['Ohne Start','movie','X-Men-Reboot','unbekannt',0,'']
-].map((r,i)=>({id:'mcu-'+String(i+1).padStart(3,'0'),order:i+1,phase:r[0],type:r[1],title:r[2],year:r[3],runtimeMin:r[4],imdbUrl:r[5]||'',episodesTotal:r[6]||0,episodesWatched:0,done:false,note:''}));
+  {phase:'Phase 1',type:'Film',title:'Iron Man',year:2008,runtime:126,imdb:'https://www.imdb.com/title/tt0371746/'},
+  {phase:'Phase 1',type:'Film',title:'Der unglaubliche Hulk',year:2008,runtime:112,imdb:'https://www.imdb.com/title/tt0800080/'},
+  {phase:'Phase 1',type:'Film',title:'Iron Man 2',year:2010,runtime:124,imdb:'https://www.imdb.com/title/tt1228705/'},
+  {phase:'Phase 1',type:'Film',title:'Thor',year:2011,runtime:115,imdb:'https://www.imdb.com/title/tt0800369/'},
+  {phase:'Phase 1',type:'Film',title:'Captain America: The First Avenger',year:2011,runtime:124,imdb:'https://www.imdb.com/title/tt0458339/'},
+  {phase:'Phase 1',type:'Film',title:'Marvel’s The Avengers',year:2012,runtime:143,imdb:'https://www.imdb.com/title/tt0848228/'},
+  {phase:'Phase 2',type:'Film',title:'Iron Man 3',year:2013,runtime:130,imdb:'https://www.imdb.com/title/tt1300854/'},
+  {phase:'Phase 2',type:'Film',title:'Thor – The Dark Kingdom',year:2013,runtime:112,imdb:'https://www.imdb.com/title/tt1981115/'},
+  {phase:'Phase 2',type:'Film',title:'The Return of the First Avenger',year:2014,runtime:136,imdb:'https://www.imdb.com/title/tt1843866/'},
+  {phase:'Phase 2',type:'Film',title:'Guardians of the Galaxy',year:2014,runtime:121,imdb:'https://www.imdb.com/title/tt2015381/'},
+  {phase:'Phase 2',type:'Serie',title:'Daredevil Staffel 1',year:2015,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:54,imdb:'https://www.imdb.com/title/tt3322312/'},
+  {phase:'Phase 2',type:'Film',title:'Avengers: Age of Ultron',year:2015,runtime:141,imdb:'https://www.imdb.com/title/tt2395427/'},
+  {phase:'Phase 2',type:'Film',title:'Ant-Man',year:2015,runtime:117,imdb:'https://www.imdb.com/title/tt0478970/'},
+  {phase:'Phase 2',type:'Serie',title:'Jessica Jones Staffel 1',year:2015,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:52,imdb:'https://www.imdb.com/title/tt2357547/'},
+  {phase:'Phase 3',type:'Serie',title:'Daredevil Staffel 2',year:2016,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:54,imdb:'https://www.imdb.com/title/tt3322312/'},
+  {phase:'Phase 3',type:'Film',title:'The First Avenger: Civil War',year:2016,runtime:147,imdb:'https://www.imdb.com/title/tt3498820/'},
+  {phase:'Phase 3',type:'Serie',title:'Luke Cage Staffel 1',year:2016,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:55,imdb:'https://www.imdb.com/title/tt3322314/'},
+  {phase:'Phase 3',type:'Film',title:'Doctor Strange',year:2016,runtime:115,imdb:'https://www.imdb.com/title/tt1211837/'},
+  {phase:'Phase 3',type:'Serie',title:'Iron Fist Staffel 1',year:2017,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:55,imdb:'https://www.imdb.com/title/tt3322310/'},
+  {phase:'Phase 3',type:'Film',title:'Guardians of the Galaxy Vol. 2',year:2017,runtime:136,imdb:'https://www.imdb.com/title/tt3896198/'},
+  {phase:'Phase 3',type:'Film',title:'Spider-Man: Homecoming',year:2017,runtime:133,imdb:'https://www.imdb.com/title/tt2250912/'},
+  {phase:'Phase 3',type:'Serie',title:'The Defenders',year:2017,totalEpisodes:8,watchedEpisodes:0,episodeMinutes:50,imdb:'https://www.imdb.com/title/tt4230076/'},
+  {phase:'Phase 3',type:'Film',title:'Thor: Tag der Entscheidung',year:2017,runtime:130,imdb:'https://www.imdb.com/title/tt3501632/'},
+  {phase:'Phase 3',type:'Serie',title:'The Punisher Staffel 1',year:2017,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:53,imdb:'https://www.imdb.com/title/tt5675620/'},
+  {phase:'Phase 3',type:'Film',title:'Black Panther',year:2018,runtime:134,imdb:'https://www.imdb.com/title/tt1825683/'},
+  {phase:'Phase 3',type:'Serie',title:'Jessica Jones Staffel 2',year:2018,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:52,imdb:'https://www.imdb.com/title/tt2357547/'},
+  {phase:'Phase 3',type:'Film',title:'Avengers: Infinity War',year:2018,runtime:149,imdb:'https://www.imdb.com/title/tt4154756/'},
+  {phase:'Phase 3',type:'Film',title:'Ant-Man and the Wasp',year:2018,runtime:118,imdb:'https://www.imdb.com/title/tt5095030/'},
+  {phase:'Phase 3',type:'Serie',title:'Luke Cage Staffel 2',year:2018,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:55,imdb:'https://www.imdb.com/title/tt3322314/'},
+  {phase:'Phase 3',type:'Serie',title:'Iron Fist Staffel 2',year:2018,totalEpisodes:10,watchedEpisodes:0,episodeMinutes:55,imdb:'https://www.imdb.com/title/tt3322310/'},
+  {phase:'Phase 3',type:'Serie',title:'Daredevil Staffel 3',year:2018,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:54,imdb:'https://www.imdb.com/title/tt3322312/'},
+  {phase:'Phase 3',type:'Serie',title:'The Punisher Staffel 2',year:2019,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:53,imdb:'https://www.imdb.com/title/tt5675620/'},
+  {phase:'Phase 3',type:'Film',title:'Captain Marvel',year:2019,runtime:123,imdb:'https://www.imdb.com/title/tt4154664/'},
+  {phase:'Phase 3',type:'Film',title:'Avengers: Endgame',year:2019,runtime:181,imdb:'https://www.imdb.com/title/tt4154796/'},
+  {phase:'Phase 3',type:'Serie',title:'Jessica Jones Staffel 3',year:2019,totalEpisodes:13,watchedEpisodes:0,episodeMinutes:52,imdb:'https://www.imdb.com/title/tt2357547/'},
+  {phase:'Phase 3',type:'Film',title:'Spider-Man: Far From Home',year:2019,runtime:129,imdb:'https://www.imdb.com/title/tt6320628/'},
+  {phase:'Phase 4',type:'Serie',title:'WandaVision',year:2021,totalEpisodes:9,watchedEpisodes:0,episodeMinutes:35,imdb:'https://www.imdb.com/title/tt9140560/'},
+  {phase:'Phase 4',type:'Serie',title:'The Falcon and the Winter Soldier',year:2021,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:50,imdb:'https://www.imdb.com/title/tt9208876/'},
+  {phase:'Phase 4',type:'Serie',title:'Loki Staffel 1',year:2021,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:50,imdb:'https://www.imdb.com/title/tt9140554/'},
+  {phase:'Phase 4',type:'Film',title:'Black Widow',year:2021,runtime:134,imdb:'https://www.imdb.com/title/tt3480822/'},
+  {phase:'Phase 4',type:'Serie',title:'Marvel’s What If…? Staffel 1',year:2021,totalEpisodes:9,watchedEpisodes:0,episodeMinutes:32,imdb:'https://www.imdb.com/title/tt10168312/'},
+  {phase:'Phase 4',type:'Film',title:'Shang-Chi: And the Legend of the Ten Rings',year:2021,runtime:132,imdb:'https://www.imdb.com/title/tt9376612/'},
+  {phase:'Phase 4',type:'Film',title:'Eternals',year:2021,runtime:156,imdb:'https://www.imdb.com/title/tt9032400/'},
+  {phase:'Phase 4',type:'Serie',title:'Hawkeye',year:2021,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:45,imdb:'https://www.imdb.com/title/tt10160804/'},
+  {phase:'Phase 4',type:'Film',title:'Spider-Man: No Way Home',year:2021,runtime:148,imdb:'https://www.imdb.com/title/tt10872600/'},
+  {phase:'Phase 4',type:'Serie',title:'Moon Knight',year:2022,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:48,imdb:'https://www.imdb.com/title/tt10234724/'},
+  {phase:'Phase 4',type:'Film',title:'Doctor Strange in the Multiverse of Madness',year:2022,runtime:126,imdb:'https://www.imdb.com/title/tt9419884/'},
+  {phase:'Phase 4',type:'Serie',title:'Ms. Marvel',year:2022,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:45,imdb:'https://www.imdb.com/title/tt10857164/'},
+  {phase:'Phase 4',type:'Film',title:'Thor: Love and Thunder',year:2022,runtime:118,imdb:'https://www.imdb.com/title/tt10648342/'},
+  {phase:'Phase 4',type:'Serie',title:'Ich bin Groot Staffel 1',year:2022,totalEpisodes:5,watchedEpisodes:0,episodeMinutes:5,imdb:'https://www.imdb.com/title/tt13623148/'},
+  {phase:'Phase 4',type:'Serie',title:'She-Hulk: Die Anwältin',year:2022,totalEpisodes:9,watchedEpisodes:0,episodeMinutes:32,imdb:'https://www.imdb.com/title/tt10857160/'},
+  {phase:'Phase 4',type:'Special',title:'Werewolf by Night',year:2022,runtime:52,imdb:'https://www.imdb.com/title/tt15318872/'},
+  {phase:'Phase 4',type:'Film',title:'Black Panther: Wakanda Forever',year:2022,runtime:161,imdb:'https://www.imdb.com/title/tt9114286/'},
+  {phase:'Phase 4',type:'Special',title:'Guardians of the Galaxy Holiday Special',year:2022,runtime:42,imdb:'https://www.imdb.com/title/tt13623136/'},
+  {phase:'Phase 5',type:'Film',title:'Ant-Man and the Wasp: Quantumania',year:2023,runtime:124,imdb:'https://www.imdb.com/title/tt10954600/'},
+  {phase:'Phase 5',type:'Film',title:'Guardians of the Galaxy Vol. 3',year:2023,runtime:150,imdb:'https://www.imdb.com/title/tt6791350/'},
+  {phase:'Phase 5',type:'Serie',title:'Secret Invasion',year:2023,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:43,imdb:'https://www.imdb.com/title/tt13157618/'},
+  {phase:'Phase 5',type:'Serie',title:'Ich bin Groot Staffel 2',year:2023,totalEpisodes:5,watchedEpisodes:0,episodeMinutes:5,imdb:'https://www.imdb.com/title/tt13623148/'},
+  {phase:'Phase 5',type:'Serie',title:'Loki Staffel 2',year:2023,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:50,imdb:'https://www.imdb.com/title/tt9140554/'},
+  {phase:'Phase 5',type:'Film',title:'The Marvels',year:2023,runtime:105,imdb:'https://www.imdb.com/title/tt10676048/'},
+  {phase:'Phase 5',type:'Serie',title:'Marvel’s What If…? Staffel 2',year:2023,totalEpisodes:9,watchedEpisodes:0,episodeMinutes:32,imdb:'https://www.imdb.com/title/tt10168312/'},
+  {phase:'Phase 5',type:'Serie',title:'Echo',year:2024,totalEpisodes:5,watchedEpisodes:0,episodeMinutes:40,imdb:'https://www.imdb.com/title/tt13966962/'},
+  {phase:'Phase 5',type:'Film',title:'Deadpool & Wolverine',year:2024,runtime:128,imdb:'https://www.imdb.com/title/tt6263850/'},
+  {phase:'Phase 5',type:'Serie',title:'Agatha All Along',year:2024,totalEpisodes:9,watchedEpisodes:0,episodeMinutes:40,imdb:'https://www.imdb.com/title/tt15571732/'},
+  {phase:'Phase 5',type:'Serie',title:'Marvel’s What If…? Staffel 3',year:2024,totalEpisodes:8,watchedEpisodes:0,episodeMinutes:32,imdb:'https://www.imdb.com/title/tt10168312/'},
+  {phase:'Phase 5',type:'Serie',title:'Der freundliche Spider-Man aus der Nachbarschaft',year:2025,totalEpisodes:10,watchedEpisodes:0,episodeMinutes:29,imdb:'https://www.imdb.com/title/tt16027074/'},
+  {phase:'Phase 5',type:'Film',title:'Captain America: Brave New World',year:2025,runtime:118,imdb:'https://www.imdb.com/title/tt14513804/'},
+  {phase:'Phase 5',type:'Serie',title:'Daredevil: Born Again Staffel 1',year:2025,totalEpisodes:9,watchedEpisodes:0,episodeMinutes:50,imdb:'https://www.imdb.com/title/tt18923754/'},
+  {phase:'Phase 5',type:'Film',title:'Thunderbolts*',year:2025,runtime:127,imdb:'https://www.imdb.com/title/tt20969586/'},
+  {phase:'Phase 5',type:'Serie',title:'Ironheart',year:2025,totalEpisodes:6,watchedEpisodes:0,episodeMinutes:45,imdb:'https://www.imdb.com/title/tt13623126/'},
+  {phase:'Phase 6',type:'Film',title:'The Fantastic Four: First Steps',year:2025,runtime:0,imdb:'https://www.imdb.com/title/tt10676052/'},
+  {phase:'Phase 6',type:'Serie',title:'Eyes of Wakanda',year:2025,totalEpisodes:4,watchedEpisodes:0,episodeMinutes:30,imdb:''},
+  {phase:'Phase 6',type:'Serie',title:'Marvel Zombies',year:2025,totalEpisodes:4,watchedEpisodes:0,episodeMinutes:30,imdb:'https://www.imdb.com/title/tt16027014/'},
+  {phase:'Phase 6',type:'Serie',title:'Wonder Man',year:2026,totalEpisodes:0,watchedEpisodes:0,episodeMinutes:0,imdb:'https://www.imdb.com/title/tt21066114/'},
+  {phase:'Phase 6',type:'Serie',title:'Daredevil: Born Again Staffel 2',year:2026,totalEpisodes:0,watchedEpisodes:0,episodeMinutes:0,imdb:'https://www.imdb.com/title/tt18923754/'},
+  {phase:'Phase 6',type:'Special',title:'The Punisher: One Last Kill',year:2026,runtime:0,imdb:''},
+  {phase:'Phase 6',type:'Film',title:'Spider-Man: Brand New Day',year:2026,runtime:0,imdb:'https://www.imdb.com/title/tt22084616/'},
+  {phase:'Phase 6',type:'Serie',title:'VisionQuest',year:2026,totalEpisodes:0,watchedEpisodes:0,episodeMinutes:0,imdb:''},
+  {phase:'Phase 6',type:'Film',title:'Avengers: Doomsday',year:2026,runtime:0,imdb:'https://www.imdb.com/title/tt21357150/'},
+  {phase:'Phase 6',type:'Film',title:'Avengers: Secret Wars',year:2027,runtime:0,imdb:'https://www.imdb.com/title/tt21361444/'},
+  {phase:'Phase 7',type:'Film',title:'Unbekannter Film – 17. Februar 2028',year:2028,runtime:0,imdb:''},
+  {phase:'Phase 7',type:'Film',title:'Unbekannter Film – 4. Mai 2028',year:2028,runtime:0,imdb:''},
+  {phase:'Phase 7',type:'Film',title:'Unbekannter Film – 9. November 2028',year:2028,runtime:0,imdb:''},
+  {phase:'Phase 7',type:'Film',title:'Unbekannter Film – 14. Dezember 2028',year:2028,runtime:0,imdb:''},
+  {phase:'Geplant',type:'Film',title:'Armor Wars',year:'unbekannt',runtime:0,imdb:'https://www.imdb.com/title/tt13623128/'},
+  {phase:'Geplant',type:'Film',title:'Shang-Chi 2',year:'unbekannt',runtime:0,imdb:''},
+  {phase:'Geplant',type:'Film',title:'Blade',year:'unbekannt',runtime:0,imdb:'https://www.imdb.com/title/tt10671440/'},
+  {phase:'Geplant',type:'Serie',title:'Nova',year:'unbekannt',totalEpisodes:0,watchedEpisodes:0,episodeMinutes:0,imdb:''},
+  {phase:'Geplant',type:'Film',title:'Black Panther 3',year:'unbekannt',runtime:0,imdb:''},
+  {phase:'Geplant',type:'Film',title:'X-Men-Reboot',year:'unbekannt',runtime:0,imdb:''}
+].map((item, index) => ({...item, id: `mcu-${index + 1}`, done: false}));
 
-let data = load();
-let editingId = null;
-const $ = sel => document.querySelector(sel);
-const list = $('#list');
+let items = load();
 
-function normalizeItem(item){
-  if(!item) return item;
-  if(item.title === 'Werewolf by Night' || item.title === 'Guardians of the Galaxy Holiday Special' || item.title === 'The Punisher: One Last Kill') item.type = 'special';
-  item.episodesWatched = Math.max(0, Number(item.episodesWatched)||0);
-  item.episodesTotal = Math.max(0, Number(item.episodesTotal)||0);
-  item.runtimeMin = Math.max(0, Number(item.runtimeMin)||0);
-  return item;
-}
 function load(){
-  try { return (JSON.parse(localStorage.getItem(STORAGE_KEY)) || structuredClone(seedItems)).map(normalizeItem); }
-  catch { return structuredClone(seedItems).map(normalizeItem); }
+  try{
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(Array.isArray(saved) && saved.length) return mergeSeed(saved);
+  }catch(e){}
+  return seedItems;
 }
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-function totalMinutes(item){ return item.type === 'series' ? (Number(item.runtimeMin)||0) * (Number(item.episodesTotal)||0) : (Number(item.runtimeMin)||0); }
-function watchedMinutes(item){
-  if(item.done) return totalMinutes(item);
-  if(item.type === 'series') return (Number(item.runtimeMin)||0) * Math.min(Number(item.episodesWatched)||0, Number(item.episodesTotal)||0);
-  return 0;
+
+function mergeSeed(saved){
+  return seedItems.map(seed => ({...seed, ...(saved.find(x => x.id === seed.id) || {})}));
+}
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+function minutesOf(item){
+  if(item.type === 'Serie') return Math.max(0,(Number(item.totalEpisodes)||0) - (Number(item.watchedEpisodes)||0)) * (Number(item.episodeMinutes)||0);
+  return item.done ? 0 : (Number(item.runtime)||0);
+}
+function totalMinutes(item){
+  if(item.type === 'Serie') return (Number(item.totalEpisodes)||0) * (Number(item.episodeMinutes)||0);
+  return Number(item.runtime)||0;
+}
+function isDone(item){
+  if(item.type === 'Serie') return (Number(item.totalEpisodes)||0) > 0 && (Number(item.watchedEpisodes)||0) >= (Number(item.totalEpisodes)||0);
+  return !!item.done;
 }
 function fmtMin(min){
-  min = Math.max(0, Math.round(min || 0));
-  const h = Math.floor(min / 60), m = min % 60;
-  return h ? `${h} h ${m} min` : `${m} min`;
+  const h = Math.floor(min/60), m = min%60;
+  return h ? `${h} h ${m} Min` : `${m} Min`;
 }
-function status(item){
-  if(item.done) return 'done';
-  if(item.type === 'series' && item.episodesWatched > 0) return 'started';
-  return 'open';
-}
-function renderPhaseOptions(){
-  const phases = [...new Set(data.map(i=>i.phase))];
-  $('#phaseFilter').innerHTML = '<option value="all">Alle Phasen</option>' + phases.map(p=>`<option>${p}</option>`).join('');
-}
-function renderDashboard(items=data){
-  const known = data.filter(i=>totalMinutes(i)>0);
-  const total = known.reduce((s,i)=>s+totalMinutes(i),0);
-  const watched = data.reduce((s,i)=>s+watchedMinutes(i),0);
-  const rest = Math.max(0,total-watched);
-  const openMovies = data.filter(i=>i.type==='movie' && !i.done).length;
-  const openSpecials = data.filter(i=>i.type==='special' && !i.done).length;
-  const openSeries = data.filter(i=>i.type==='series' && !i.done).length;
-  const percent = total ? Math.round(watched/total*100) : 0;
-  $('#dashboard').innerHTML = `
-    <div class="stat"><b>${percent}%</b><span>Fortschritt nach Minuten</span><div class="progress"><div class="bar" style="width:${percent}%"></div></div></div>
-    <div class="stat"><b>${openMovies}</b><span>Filme noch</span></div>
-    <div class="stat"><b>${openSeries}</b><span>Serien/Staffeln noch</span></div>
-    <div class="stat"><b>${openSpecials}</b><span>Specials noch</span></div>
-    <div class="stat"><b>${fmtMin(rest)}</b><span>bekannte Restlaufzeit</span></div>`;
-}
-function filtered(){
-  const q = $('#searchInput').value.trim().toLowerCase();
-  const t = $('#typeFilter').value;
-  const s = $('#statusFilter').value;
-  const p = $('#phaseFilter').value;
-  return data.filter(i => (!q || `${i.title} ${i.phase} ${i.year}`.toLowerCase().includes(q)) && (t==='all'||i.type===t) && (s==='all'||status(i)===s) && (p==='all'||i.phase===p));
-}
-function render(){
-  renderDashboard();
-  const items = filtered();
-  let lastPhase = '';
-  list.innerHTML = items.map(item => {
-    const phase = item.phase !== lastPhase ? `<h2 class="phase-title">${item.phase}</h2>` : '';
-    lastPhase = item.phase;
-    const total = totalMinutes(item), watched = watchedMinutes(item);
-    const pct = total ? Math.round(watched/total*100) : (item.done ? 100 : 0);
-    const seriesControls = item.type === 'series' ? `<div class="episode-row"><span class="badge">Folgen</span><button class="episode-btn ghost" data-ep-dec="${item.id}">−1</button><strong>${item.episodesWatched}</strong><span>/ ${item.episodesTotal || '?'} · ca. ${item.runtimeMin || '?'} min/Folge</span><button class="episode-btn" data-ep-inc="${item.id}">+1 Folge</button></div>` : '';
-    return `${phase}<article class="entry ${item.done ? 'done':''}">
-      <div class="entry-head">
-        <div class="num">${item.order}</div>
-        <div>
-          <div class="title-row"><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${item.year}</span></div>
-          <p class="meta">${total ? `${fmtMin(total)} gesamt · ${fmtMin(Math.max(0,total-watched))} offen · ${pct}%` : 'Laufzeit/Folgen noch unbekannt'} ${item.imdbUrl ? `· <a href="${item.imdbUrl}" target="_blank" rel="noopener">IMDb</a>`:''}</p>
-          <div class="progress"><div class="bar" style="width:${pct}%"></div></div>
-          ${seriesControls}
-          ${item.note ? `<p class="note">${escapeHtml(item.note)}</p>`:''}
-        </div>
-        <div class="controls">
-          <button class="small" data-toggle="${item.id}">${item.done?'Öffnen':'Fertig'}</button>
-          <button class="small ghost" data-edit="${item.id}">Bearbeiten</button>
-        </div>
-      </div>
-    </article>`;
-  }).join('') || '<p class="card" style="padding:1rem">Keine Einträge gefunden.</p>';
-}
-function typeLabel(type){ return type === 'series' ? 'Serie' : (type === 'special' ? 'Special' : 'Film'); }
-function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 
-['searchInput','typeFilter','statusFilter','phaseFilter'].forEach(id => $('#'+id).addEventListener('input', render));
-$('#resetFilters').onclick = () => { $('#searchInput').value=''; $('#typeFilter').value='all'; $('#statusFilter').value='all'; $('#phaseFilter').value='all'; render(); };
-list.addEventListener('click', e => {
-  const toggle = e.target.closest('[data-toggle]');
-  const edit = e.target.closest('[data-edit]');
-  const inc = e.target.closest('[data-ep-inc]');
-  const dec = e.target.closest('[data-ep-dec]');
-  if(toggle){ const item = data.find(i=>i.id===toggle.dataset.toggle); item.done = !item.done; if(item.done && item.type==='series') item.episodesWatched = item.episodesTotal; save(); render(); }
-  if(inc){ changeEpisode(inc.dataset.epInc, 1); }
-  if(dec){ changeEpisode(dec.dataset.epDec, -1); }
-  if(edit) openEdit(edit.dataset.edit);
-});
-function changeEpisode(id, delta){
-  const item = data.find(i=>i.id===id);
-  if(!item) return;
-  const max = Number(item.episodesTotal)||999;
-  item.episodesWatched = Math.max(0, Math.min(max, (Number(item.episodesWatched)||0) + delta));
-  item.done = item.episodesTotal > 0 && item.episodesWatched >= item.episodesTotal;
-  save();
-  render();
+function renderFilters(){
+  const phaseFilter = document.getElementById('phaseFilter');
+  const phases = [...new Set(items.map(i => i.phase))];
+  phaseFilter.innerHTML = '<option value="all">Alle Phasen</option>' + phases.map(p => `<option value="${p}">${p}</option>`).join('');
 }
-function openEdit(id){
-  editingId = id;
-  const item = data.find(i=>i.id===id);
-  const f = $('#editForm');
-  f.title.value = item.title; f.year.value = item.year; f.phase.value = item.phase; f.type.value = item.type; f.runtimeMin.value = item.runtimeMin; f.episodesTotal.value = item.episodesTotal; f.episodesWatched.value = item.episodesWatched; f.imdbUrl.value = item.imdbUrl; f.note.value = item.note || '';
-  $('#editDialog').showModal();
+
+function renderDashboard(){
+  const done = items.filter(isDone).length;
+  const open = items.length - done;
+  const openItems = items.filter(i => !isDone(i));
+  const leftMin = openItems.reduce((sum,i)=>sum+minutesOf(i),0);
+  document.getElementById('doneItems').textContent = done;
+  document.getElementById('leftItems').textContent = open;
+  document.getElementById('leftMovies').textContent = openItems.filter(i=>i.type==='Film').length;
+  document.getElementById('leftSeries').textContent = openItems.filter(i=>i.type==='Serie').length;
+  document.getElementById('leftSpecials').textContent = openItems.filter(i=>i.type==='Special').length;
+  document.getElementById('leftMinutes').textContent = fmtMin(leftMin);
 }
-$('#saveEdit').addEventListener('click', e => {
-  e.preventDefault();
-  const item = data.find(i=>i.id===editingId); const f = $('#editForm');
-  Object.assign(item,{title:f.title.value,year:f.year.value,phase:f.phase.value,type:f.type.value,runtimeMin:Number(f.runtimeMin.value)||0,episodesTotal:Number(f.episodesTotal.value)||0,episodesWatched:Number(f.episodesWatched.value)||0,imdbUrl:f.imdbUrl.value,note:f.note.value});
-  item.episodesWatched = Math.min(item.episodesWatched, item.episodesTotal || item.episodesWatched);
-  item.done = item.type==='series' ? (item.episodesTotal>0 && item.episodesWatched>=item.episodesTotal) : item.done;
-  save(); renderPhaseOptions(); render(); $('#editDialog').close();
+
+function renderList(){
+  const list = document.getElementById('list');
+  const tpl = document.getElementById('itemTemplate');
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const phase = document.getElementById('phaseFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  list.innerHTML = '';
+  items.filter(item => {
+    if(q && !`${item.title} ${item.phase} ${item.year}`.toLowerCase().includes(q)) return false;
+    if(phase !== 'all' && item.phase !== phase) return false;
+    if(type !== 'all' && item.type !== type) return false;
+    if(status === 'open' && isDone(item)) return false;
+    if(status === 'done' && !isDone(item)) return false;
+    return true;
+  }).forEach(item => {
+    const node = tpl.content.cloneNode(true);
+    const article = node.querySelector('.item');
+    if(isDone(item)) article.classList.add('done');
+    node.querySelector('h2').textContent = item.title;
+    node.querySelector('.badges').innerHTML = `<span class="badge ${item.type}">${item.type}</span><span class="badge">${item.phase}</span>`;
+    const imdbLink = item.imdb ? ` · <a href="${item.imdb}" target="_blank" rel="noopener">IMDb</a>` : '';
+    const metaRuntime = item.type === 'Serie'
+      ? `${item.totalEpisodes||0} Folgen · ca. ${item.episodeMinutes||0} Min/Folge · Rest: ${fmtMin(minutesOf(item))}`
+      : `${item.runtime||0} Min · Rest: ${fmtMin(minutesOf(item))}`;
+    node.querySelector('.meta').innerHTML = `${item.year} · ${metaRuntime}${imdbLink}`;
+    const check = node.querySelector('.check input');
+    check.checked = isDone(item);
+    check.addEventListener('change', () => {
+      if(item.type === 'Serie') item.watchedEpisodes = check.checked ? (Number(item.totalEpisodes)||0) : 0;
+      else item.done = check.checked;
+      save(); renderAll(false);
+    });
+    const progress = node.querySelector('.progress-wrap');
+    if(item.type === 'Serie'){
+      progress.classList.remove('hidden');
+      const pct = (Number(item.totalEpisodes)||0) ? Math.min(100, Math.round((Number(item.watchedEpisodes)||0)/(Number(item.totalEpisodes)||0)*100)) : 0;
+      node.querySelector('.progress-line span').style.width = `${pct}%`;
+      node.querySelector('.episodes').textContent = `${item.watchedEpisodes||0}/${item.totalEpisodes||0} Folgen`;
+      node.querySelector('.plus').addEventListener('click', () => { item.watchedEpisodes = Math.min(Number(item.totalEpisodes)||0, (Number(item.watchedEpisodes)||0)+1); save(); renderAll(false); });
+      node.querySelector('.minus').addEventListener('click', () => { item.watchedEpisodes = Math.max(0, (Number(item.watchedEpisodes)||0)-1); save(); renderAll(false); });
+    }
+    const runtime = node.querySelector('.edit-runtime');
+    const total = node.querySelector('.edit-total');
+    const epmin = node.querySelector('.edit-epmin');
+    const imdb = node.querySelector('.edit-imdb');
+    runtime.value = item.runtime || 0;
+    total.value = item.totalEpisodes || 0;
+    epmin.value = item.episodeMinutes || 0;
+    imdb.value = item.imdb || '';
+    runtime.addEventListener('change', () => { item.runtime = Number(runtime.value)||0; save(); renderAll(false); });
+    total.addEventListener('change', () => { item.totalEpisodes = Number(total.value)||0; item.watchedEpisodes = Math.min(item.watchedEpisodes||0,item.totalEpisodes); save(); renderAll(false); });
+    epmin.addEventListener('change', () => { item.episodeMinutes = Number(epmin.value)||0; save(); renderAll(false); });
+    imdb.addEventListener('change', () => { item.imdb = imdb.value.trim(); save(); renderAll(false); });
+    list.appendChild(node);
+  });
+}
+
+function renderAll(refreshFilters=true){
+  if(refreshFilters) renderFilters();
+  renderDashboard();
+  renderList();
+}
+
+['searchInput','phaseFilter','typeFilter','statusFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => renderList()));
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if(confirm('Wirklich gesamten Fortschritt zurücksetzen?')){ localStorage.removeItem(STORAGE_KEY); items = seedItems; renderAll(); }
 });
-$('#exportBtn').onclick = () => {
-  const blob = new Blob([JSON.stringify({exportedAt:new Date().toISOString(), data}, null, 2)], {type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `marvel-tracker-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href);
-};
-$('#importInput').onchange = async e => {
-  const file = e.target.files[0]; if(!file) return;
-  const parsed = JSON.parse(await file.text()); data = (Array.isArray(parsed) ? parsed : parsed.data).map(normalizeItem); save(); renderPhaseOptions(); render(); e.target.value='';
-};
-$('#resetSeedBtn').onclick = () => { if(confirm('Seed-Daten neu laden? Dein Fortschritt wird überschrieben.')){ data = structuredClone(seedItems).map(normalizeItem); save(); renderPhaseOptions(); render(); } };
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(items,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'marvel-tracker-backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById('importInput').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const imported = JSON.parse(await file.text());
+    if(!Array.isArray(imported)) throw new Error('Kein gültiges Backup');
+    items = mergeSeed(imported);
+    save(); renderAll();
+  }catch(err){ alert('Backup konnte nicht importiert werden.'); }
+});
+
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; $('#installBtn').classList.remove('hidden'); });
-$('#installBtn').onclick = async () => { if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; $('#installBtn').classList.add('hidden'); } };
-// Service Worker bewusst deaktiviert, damit GitHub Pages/iPhone nichts blockiert.
-// Die App funktioniert trotzdem offline-nah über den Browsercache und speichert lokal.
-renderPhaseOptions(); render();
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBtn').classList.remove('hidden'); });
+document.getElementById('installBtn').addEventListener('click', async () => { if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt = null; }});
+
+if('serviceWorker' in navigator){ window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(()=>{})); }
+renderAll();

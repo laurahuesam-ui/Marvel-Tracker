@@ -1,72 +1,89 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
   <title>Marvel Tracker</title>
-  <meta name="theme-color" content="#7b1f24">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="app-header">
     <div>
-      <p class="eyebrow">PWA · MCU Watch Order</p>
+      <p class="eyebrow">PWA</p>
       <h1>Marvel Tracker</h1>
+      <p class="subtitle">Filme, Serien & Specials in deiner MCU-Reihenfolge</p>
     </div>
     <button id="installBtn" class="ghost hidden">Installieren</button>
   </header>
 
   <main>
-    <section class="dashboard" id="dashboard"></section>
+    <section class="dashboard" aria-label="Dashboard">
+      <article class="card"><span id="doneItems">0</span><small>gesehen</small></article>
+      <article class="card"><span id="leftItems">0</span><small>offen</small></article>
+      <article class="card"><span id="leftMovies">0</span><small>Filme offen</small></article>
+      <article class="card"><span id="leftSeries">0</span><small>Serien/Staffeln offen</small></article>
+      <article class="card"><span id="leftSpecials">0</span><small>Specials offen</small></article>
+      <article class="card wide"><span id="leftMinutes">0 Min</span><small>Restzeit</small></article>
+    </section>
 
-    <section class="toolbar card">
-      <input id="searchInput" type="search" placeholder="Suchen: Iron Man, Phase 4, Daredevil...">
+    <section class="toolbar">
+      <input id="searchInput" type="search" placeholder="Suchen…" autocomplete="off" />
+      <select id="phaseFilter">
+        <option value="all">Alle Phasen</option>
+      </select>
       <select id="typeFilter">
-        <option value="all">Alle Typen</option>
-        <option value="movie">Filme</option>
-        <option value="series">Serien</option>
-        <option value="special">Specials</option>
+        <option value="all">Alles</option>
+        <option value="Film">Filme</option>
+        <option value="Serie">Serien</option>
+        <option value="Special">Specials</option>
       </select>
       <select id="statusFilter">
-        <option value="all">Alle Status</option>
+        <option value="all">Alle</option>
         <option value="open">Offen</option>
-        <option value="started">Angefangen</option>
-        <option value="done">Fertig</option>
+        <option value="done">Gesehen</option>
       </select>
-      <select id="phaseFilter"><option value="all">Alle Phasen</option></select>
-      <button id="resetFilters" class="ghost">Filter zurücksetzen</button>
     </section>
 
-    <section class="actions card">
+    <section class="actions">
+      <button id="resetBtn" class="danger">Fortschritt zurücksetzen</button>
       <button id="exportBtn">Backup exportieren</button>
-      <label class="file-label">Backup importieren<input id="importInput" type="file" accept="application/json"></label>
-      <button id="resetSeedBtn" class="danger ghost">Seed-Daten neu laden</button>
+      <label class="file-label">Backup importieren<input id="importInput" type="file" accept="application/json" /></label>
     </section>
 
-    <section id="list" class="list"></section>
+    <section id="list" class="list" aria-label="Marvel Liste"></section>
   </main>
 
-  <dialog id="editDialog">
-    <form method="dialog" id="editForm" class="modal-card">
-      <h2 id="editTitle">Eintrag bearbeiten</h2>
-      <div class="grid two">
-        <label>Titel<input name="title" required></label>
-        <label>Jahr/Start<input name="year"></label>
-        <label>Phase<input name="phase"></label>
-        <label>Typ<select name="type"><option value="movie">Film</option><option value="series">Serie</option><option value="special">Special</option></select></label>
-        <label>Laufzeit Minuten <input name="runtimeMin" type="number" min="0" step="1"></label>
-        <label>Folgen gesamt <input name="episodesTotal" type="number" min="0" step="1"></label>
-        <label>Folgen gesehen <input name="episodesWatched" type="number" min="0" step="1"></label>
-        <label>IMDb-Link <input name="imdbUrl" type="url"></label>
+  <template id="itemTemplate">
+    <article class="item">
+      <div class="item-top">
+        <div>
+          <div class="badges"></div>
+          <h2></h2>
+          <p class="meta"></p>
+        </div>
+        <label class="check"><input type="checkbox" /> gesehen</label>
       </div>
-      <label>Notiz<textarea name="note" rows="3"></textarea></label>
-      <menu>
-        <button value="cancel" class="ghost">Abbrechen</button>
-        <button id="saveEdit" value="default">Speichern</button>
-      </menu>
-    </form>
-  </dialog>
+      <div class="progress-wrap hidden">
+        <div class="progress-line"><span></span></div>
+        <div class="episode-row">
+          <button class="minus">−1</button>
+          <strong class="episodes"></strong>
+          <button class="plus">+1 Folge</button>
+        </div>
+      </div>
+      <details>
+        <summary>Bearbeiten</summary>
+        <div class="edit-grid">
+          <label>Laufzeit pro Film/Special (Min)<input class="edit-runtime" type="number" min="0" /></label>
+          <label>Folgen gesamt<input class="edit-total" type="number" min="0" /></label>
+          <label>Minuten pro Folge<input class="edit-epmin" type="number" min="0" /></label>
+          <label>IMDb-Link<input class="edit-imdb" type="url" /></label>
+        </div>
+      </details>
+    </article>
+  </template>
 
   <script src="app.js"></script>
 </body>
