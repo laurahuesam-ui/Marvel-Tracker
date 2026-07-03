@@ -1,5 +1,5 @@
-const CACHE = 'marvel-tracker-v5';
-const FILES = ['./', './index.html', './style.css?v=5', './app.js?v=5', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE = 'marvel-tracker-v5b';
+const FILES = ['./', './index.html', './style.css?v=5b', './app.js?v=5b', './manifest.json', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)));
