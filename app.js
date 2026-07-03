@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'marvelTrackerData.v1';
+const STORAGE_KEY = 'marvelTrackerData.v5';
 
 const seedItems = [
   ['Phase 1','movie','Iron Man','2008',126,'https://www.imdb.com/title/tt0371746/'],
@@ -233,5 +233,5 @@ $('#resetSeedBtn').onclick = () => { if(confirm('Seed-Daten neu laden? Dein Fort
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; $('#installBtn').classList.remove('hidden'); });
 $('#installBtn').onclick = async () => { if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; $('#installBtn').classList.add('hidden'); } };
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js?v=5').then(r=>r.update()).catch(()=>{}));
 renderPhaseOptions(); render();
