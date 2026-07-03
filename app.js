@@ -140,8 +140,9 @@ function renderDashboard(items=data){
   const openSpecials = data.filter(i=>i.type==='special' && !i.done).length;
   const openSeries = data.filter(i=>i.type==='series' && !i.done).length;
   const percent = total ? Math.round(watched/total*100) : 0;
+  const headerProgress = $('#headerProgress');
+  if(headerProgress) headerProgress.textContent = `${percent}%`;
   $('#dashboard').innerHTML = `
-    <div class="stat"><b>${percent}%</b><span>Fortschritt nach Minuten</span><div class="progress"><div class="bar" style="width:${percent}%"></div></div></div>
     <div class="stat"><b>${openMovies}</b><span>Filme noch</span></div>
     <div class="stat"><b>${openSeries}</b><span>Serien/Staffeln noch</span></div>
     <div class="stat"><b>${openSpecials}</b><span>Specials noch</span></div>
