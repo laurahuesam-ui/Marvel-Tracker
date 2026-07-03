@@ -24,8 +24,9 @@
       <input id="searchInput" type="search" placeholder="Suchen: Iron Man, Phase 4, Daredevil...">
       <select id="typeFilter">
         <option value="all">Alle Typen</option>
-        <option value="movie">Filme/Specials</option>
+        <option value="movie">Filme</option>
         <option value="series">Serien</option>
+        <option value="special">Specials</option>
       </select>
       <select id="statusFilter">
         <option value="all">Alle Status</option>
@@ -53,7 +54,7 @@
         <label>Titel<input name="title" required></label>
         <label>Jahr/Start<input name="year"></label>
         <label>Phase<input name="phase"></label>
-        <label>Typ<select name="type"><option value="movie">Film/Special</option><option value="series">Serie</option></select></label>
+        <label>Typ<select name="type"><option value="movie">Film</option><option value="series">Serie</option><option value="special">Special</option></select></label>
         <label>Laufzeit Minuten <input name="runtimeMin" type="number" min="0" step="1"></label>
         <label>Folgen gesamt <input name="episodesTotal" type="number" min="0" step="1"></label>
         <label>Folgen gesehen <input name="episodesWatched" type="number" min="0" step="1"></label>

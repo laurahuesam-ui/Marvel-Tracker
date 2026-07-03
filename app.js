@@ -52,9 +52,9 @@ const seedItems = [
   ['Phase 4','movie','Thor: Love and Thunder','2022',118,'https://www.imdb.com/title/tt10648342/'],
   ['Phase 4','series','Ich bin Groot Staffel 1','2022',5,'https://www.imdb.com/title/tt13623148/episodes/?season=1',5],
   ['Phase 4','series','She-Hulk: Die Anwältin','2022',34,'https://www.imdb.com/title/tt10857160/episodes/',9],
-  ['Phase 4','movie','Werewolf by Night','2022',53,'https://www.imdb.com/title/tt15318872/'],
+  ['Phase 4','special','Werewolf by Night','2022',53,'https://www.imdb.com/title/tt15318872/'],
   ['Phase 4','movie','Black Panther: Wakanda Forever','2022',161,'https://www.imdb.com/title/tt9114286/'],
-  ['Phase 4','movie','Guardians of the Galaxy Holiday Special','2022',42,'https://www.imdb.com/title/tt13623136/'],
+  ['Phase 4','special','Guardians of the Galaxy Holiday Special','2022',42,'https://www.imdb.com/title/tt13623136/'],
   ['Phase 5','movie','Ant-Man and the Wasp: Quantumania','2023',124,'https://www.imdb.com/title/tt10954600/'],
   ['Phase 5','movie','Guardians of the Galaxy Vol. 3','2023',150,'https://www.imdb.com/title/tt6791350/'],
   ['Phase 5','series','Secret Invasion','2023',47,'https://www.imdb.com/title/tt13157618/episodes/',6],
@@ -76,7 +76,7 @@ const seedItems = [
   ['Phase 6','series','Marvel Zombies','2025',30,'https://www.imdb.com/title/tt16027014/',4],
   ['Phase 6','series','Wonder Man','28.01.2026',0,'https://www.imdb.com/title/tt11206616/',0],
   ['Phase 6','series','Daredevil: Born Again Staffel 2','28.01.2026',0,'https://www.imdb.com/title/tt18923754/episodes/',0],
-  ['Phase 6','movie','The Punisher: One Last Kill','13.05.2026',0,'',0],
+  ['Phase 6','special','The Punisher: One Last Kill','13.05.2026',0,'',0],
   ['Phase 6','movie','Spider-Man: Brand New Day','30.07.2026',0,'https://www.imdb.com/title/tt22084616/'],
   ['Phase 6','series','VisionQuest','14.10.2026',0,'https://www.imdb.com/title/tt18117932/',0],
   ['Phase 6','movie','Avengers: Doomsday','16.12.2026',0,'https://www.imdb.com/title/tt21357150/'],
@@ -98,9 +98,17 @@ let editingId = null;
 const $ = sel => document.querySelector(sel);
 const list = $('#list');
 
+function normalizeItem(item){
+  if(!item) return item;
+  if(item.title === 'Werewolf by Night' || item.title === 'Guardians of the Galaxy Holiday Special' || item.title === 'The Punisher: One Last Kill') item.type = 'special';
+  item.episodesWatched = Math.max(0, Number(item.episodesWatched)||0);
+  item.episodesTotal = Math.max(0, Number(item.episodesTotal)||0);
+  item.runtimeMin = Math.max(0, Number(item.runtimeMin)||0);
+  return item;
+}
 function load(){
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || structuredClone(seedItems); }
-  catch { return structuredClone(seedItems); }
+  try { return (JSON.parse(localStorage.getItem(STORAGE_KEY)) || structuredClone(seedItems)).map(normalizeItem); }
+  catch { return structuredClone(seedItems).map(normalizeItem); }
 }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 function totalMinutes(item){ return item.type === 'series' ? (Number(item.runtimeMin)||0) * (Number(item.episodesTotal)||0) : (Number(item.runtimeMin)||0); }
@@ -129,12 +137,14 @@ function renderDashboard(items=data){
   const watched = data.reduce((s,i)=>s+watchedMinutes(i),0);
   const rest = Math.max(0,total-watched);
   const openMovies = data.filter(i=>i.type==='movie' && !i.done).length;
+  const openSpecials = data.filter(i=>i.type==='special' && !i.done).length;
   const openSeries = data.filter(i=>i.type==='series' && !i.done).length;
   const percent = total ? Math.round(watched/total*100) : 0;
   $('#dashboard').innerHTML = `
     <div class="stat"><b>${percent}%</b><span>Fortschritt nach Minuten</span><div class="progress"><div class="bar" style="width:${percent}%"></div></div></div>
-    <div class="stat"><b>${openMovies}</b><span>Filme/Specials noch</span></div>
+    <div class="stat"><b>${openMovies}</b><span>Filme noch</span></div>
     <div class="stat"><b>${openSeries}</b><span>Serien/Staffeln noch</span></div>
+    <div class="stat"><b>${openSpecials}</b><span>Specials noch</span></div>
     <div class="stat"><b>${fmtMin(rest)}</b><span>bekannte Restlaufzeit</span></div>`;
 }
 function filtered(){
@@ -153,12 +163,12 @@ function render(){
     lastPhase = item.phase;
     const total = totalMinutes(item), watched = watchedMinutes(item);
     const pct = total ? Math.round(watched/total*100) : (item.done ? 100 : 0);
-    const seriesControls = item.type === 'series' ? `<div class="episode-row"><span class="badge">Folgen</span><input data-ep="${item.id}" type="number" min="0" max="${item.episodesTotal}" value="${item.episodesWatched}"><span>/ ${item.episodesTotal || '?'} · ca. ${item.runtimeMin || '?'} min/Folge</span></div>` : '';
+    const seriesControls = item.type === 'series' ? `<div class="episode-row"><span class="badge">Folgen</span><button class="episode-btn ghost" data-ep-dec="${item.id}">−1</button><strong>${item.episodesWatched}</strong><span>/ ${item.episodesTotal || '?'} · ca. ${item.runtimeMin || '?'} min/Folge</span><button class="episode-btn" data-ep-inc="${item.id}">+1 Folge</button></div>` : '';
     return `${phase}<article class="entry ${item.done ? 'done':''}">
       <div class="entry-head">
         <div class="num">${item.order}</div>
         <div>
-          <div class="title-row"><h3>${escapeHtml(item.title)}</h3><span class="badge">${item.type==='series'?'Serie':'Film/Special'}</span><span class="badge">${item.year}</span></div>
+          <div class="title-row"><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${item.year}</span></div>
           <p class="meta">${total ? `${fmtMin(total)} gesamt · ${fmtMin(Math.max(0,total-watched))} offen · ${pct}%` : 'Laufzeit/Folgen noch unbekannt'} ${item.imdbUrl ? `· <a href="${item.imdbUrl}" target="_blank" rel="noopener">IMDb</a>`:''}</p>
           <div class="progress"><div class="bar" style="width:${pct}%"></div></div>
           ${seriesControls}
@@ -172,6 +182,7 @@ function render(){
     </article>`;
   }).join('') || '<p class="card" style="padding:1rem">Keine Einträge gefunden.</p>';
 }
+function typeLabel(type){ return type === 'series' ? 'Serie' : (type === 'special' ? 'Special' : 'Film'); }
 function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 
 ['searchInput','typeFilter','statusFilter','phaseFilter'].forEach(id => $('#'+id).addEventListener('input', render));
@@ -179,12 +190,22 @@ $('#resetFilters').onclick = () => { $('#searchInput').value=''; $('#typeFilter'
 list.addEventListener('click', e => {
   const toggle = e.target.closest('[data-toggle]');
   const edit = e.target.closest('[data-edit]');
+  const inc = e.target.closest('[data-ep-inc]');
+  const dec = e.target.closest('[data-ep-dec]');
   if(toggle){ const item = data.find(i=>i.id===toggle.dataset.toggle); item.done = !item.done; if(item.done && item.type==='series') item.episodesWatched = item.episodesTotal; save(); render(); }
+  if(inc){ changeEpisode(inc.dataset.epInc, 1); }
+  if(dec){ changeEpisode(dec.dataset.epDec, -1); }
   if(edit) openEdit(edit.dataset.edit);
 });
-list.addEventListener('input', e => {
-  if(e.target.matches('[data-ep]')){ const item = data.find(i=>i.id===e.target.dataset.ep); item.episodesWatched = Math.max(0, Math.min(Number(e.target.value)||0, Number(item.episodesTotal)||0)); item.done = item.episodesTotal > 0 && item.episodesWatched >= item.episodesTotal; save(); renderDashboard(); }
-});
+function changeEpisode(id, delta){
+  const item = data.find(i=>i.id===id);
+  if(!item) return;
+  const max = Number(item.episodesTotal)||999;
+  item.episodesWatched = Math.max(0, Math.min(max, (Number(item.episodesWatched)||0) + delta));
+  item.done = item.episodesTotal > 0 && item.episodesWatched >= item.episodesTotal;
+  save();
+  render();
+}
 function openEdit(id){
   editingId = id;
   const item = data.find(i=>i.id===id);
@@ -206,9 +227,9 @@ $('#exportBtn').onclick = () => {
 };
 $('#importInput').onchange = async e => {
   const file = e.target.files[0]; if(!file) return;
-  const parsed = JSON.parse(await file.text()); data = Array.isArray(parsed) ? parsed : parsed.data; save(); renderPhaseOptions(); render(); e.target.value='';
+  const parsed = JSON.parse(await file.text()); data = (Array.isArray(parsed) ? parsed : parsed.data).map(normalizeItem); save(); renderPhaseOptions(); render(); e.target.value='';
 };
-$('#resetSeedBtn').onclick = () => { if(confirm('Seed-Daten neu laden? Dein Fortschritt wird überschrieben.')){ data = structuredClone(seedItems); save(); renderPhaseOptions(); render(); } };
+$('#resetSeedBtn').onclick = () => { if(confirm('Seed-Daten neu laden? Dein Fortschritt wird überschrieben.')){ data = structuredClone(seedItems).map(normalizeItem); save(); renderPhaseOptions(); render(); } };
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; $('#installBtn').classList.remove('hidden'); });
 $('#installBtn').onclick = async () => { if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; $('#installBtn').classList.add('hidden'); } };
