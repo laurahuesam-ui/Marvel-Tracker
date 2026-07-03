@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'marvelTrackerData.v5';
+const STORAGE_KEY = 'marvelTrackerData.v1';
 
 const seedItems = [
   ['Phase 1','movie','Iron Man','2008',126,'https://www.imdb.com/title/tt0371746/'],
@@ -140,9 +140,8 @@ function renderDashboard(items=data){
   const openSpecials = data.filter(i=>i.type==='special' && !i.done).length;
   const openSeries = data.filter(i=>i.type==='series' && !i.done).length;
   const percent = total ? Math.round(watched/total*100) : 0;
-  const headerProgress = $('#headerProgress');
-  if(headerProgress) headerProgress.textContent = `${percent}%`;
   $('#dashboard').innerHTML = `
+    <div class="stat"><b>${percent}%</b><span>Fortschritt nach Minuten</span><div class="progress"><div class="bar" style="width:${percent}%"></div></div></div>
     <div class="stat"><b>${openMovies}</b><span>Filme noch</span></div>
     <div class="stat"><b>${openSeries}</b><span>Serien/Staffeln noch</span></div>
     <div class="stat"><b>${openSpecials}</b><span>Specials noch</span></div>
@@ -164,7 +163,7 @@ function render(){
     lastPhase = item.phase;
     const total = totalMinutes(item), watched = watchedMinutes(item);
     const pct = total ? Math.round(watched/total*100) : (item.done ? 100 : 0);
-    const seriesControls = item.type === 'series' ? `<div class="episode-row"><span class="badge">Folgen</span><strong class="episode-count">${item.episodesWatched}</strong><span>/ ${item.episodesTotal || '?'} · ca. ${item.runtimeMin || '?'} min/Folge</span><button class="episode-btn" data-ep-inc="${item.id}">+1 Folge</button></div>` : '';
+    const seriesControls = item.type === 'series' ? `<div class="episode-row"><span class="badge">Folgen</span><strong>${item.episodesWatched}</strong><span>/ ${item.episodesTotal || '?'} · ca. ${item.runtimeMin || '?'} min/Folge</span><button class="episode-btn" data-ep-inc="${item.id}">+1 Folge</button></div>` : '';
     return `${phase}<article class="entry ${item.done ? 'done':''}">
       <div class="entry-head">
         <div class="num">${item.order}</div>
@@ -192,8 +191,10 @@ list.addEventListener('click', e => {
   const toggle = e.target.closest('[data-toggle]');
   const edit = e.target.closest('[data-edit]');
   const inc = e.target.closest('[data-ep-inc]');
+  const dec = e.target.closest('[data-ep-dec]');
   if(toggle){ const item = data.find(i=>i.id===toggle.dataset.toggle); item.done = !item.done; if(item.done && item.type==='series') item.episodesWatched = item.episodesTotal; save(); render(); }
   if(inc){ changeEpisode(inc.dataset.epInc, 1); }
+  if(dec){ changeEpisode(dec.dataset.epDec, -1); }
   if(edit) openEdit(edit.dataset.edit);
 });
 function changeEpisode(id, delta){
@@ -232,5 +233,5 @@ $('#resetSeedBtn').onclick = () => { if(confirm('Seed-Daten neu laden? Dein Fort
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; $('#installBtn').classList.remove('hidden'); });
 $('#installBtn').onclick = async () => { if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; $('#installBtn').classList.add('hidden'); } };
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js?v=5').then(r=>r.update()).catch(()=>{}));
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
 renderPhaseOptions(); render();

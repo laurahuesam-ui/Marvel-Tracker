@@ -6,13 +6,14 @@
   <title>Marvel Tracker</title>
   <meta name="theme-color" content="#7b1f24">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css?v=5b">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="app-header">
     <div>
       <p class="eyebrow">PWA · MCU Watch Order</p>
-      <h1>Marvel Tracker</h1><p class="version">Version 5</p>
+      <h1>Marvel Tracker</h1>
+      <p class="version">Version 5</p>
     </div>
     <div class="header-actions"><div id="headerProgress" class="header-progress">0%</div><button id="installBtn" class="ghost hidden">Installieren</button></div>
   </header>
@@ -24,9 +25,8 @@
       <input id="searchInput" type="search" placeholder="Suchen: Iron Man, Phase 4, Daredevil...">
       <select id="typeFilter">
         <option value="all">Alle Typen</option>
-        <option value="movie">Filme</option>
+        <option value="movie">Filme/Specials</option>
         <option value="series">Serien</option>
-        <option value="special">Specials</option>
       </select>
       <select id="statusFilter">
         <option value="all">Alle Status</option>
@@ -54,7 +54,7 @@
         <label>Titel<input name="title" required></label>
         <label>Jahr/Start<input name="year"></label>
         <label>Phase<input name="phase"></label>
-        <label>Typ<select name="type"><option value="movie">Film</option><option value="series">Serie</option><option value="special">Special</option></select></label>
+        <label>Typ<select name="type"><option value="movie">Film/Special</option><option value="series">Serie</option></select></label>
         <label>Laufzeit Minuten <input name="runtimeMin" type="number" min="0" step="1"></label>
         <label>Folgen gesamt <input name="episodesTotal" type="number" min="0" step="1"></label>
         <label>Folgen gesehen <input name="episodesWatched" type="number" min="0" step="1"></label>
@@ -68,6 +68,6 @@
     </form>
   </dialog>
 
-  <script src="app.js?v=5b"></script>
+  <script src="app.js"></script>
 </body>
 </html>
