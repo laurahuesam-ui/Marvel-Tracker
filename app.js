@@ -91,7 +91,7 @@ const seedItems = [
   ['Ohne Start','series','Nova','unbekannt',0,'',0],
   ['Ohne Start','movie','Black Panther 3','unbekannt',0,''],
   ['Ohne Start','movie','X-Men-Reboot','unbekannt',0,'']
-].map((r,i)=>({id:'mcu-'+String(i+1).padStart(3,'0'),order:i+1,phase:r[0],type:r[1],title:r[2],year:r[3],runtimeMin:r[4],imdbUrl:r[5]||'',episodesTotal:r[6]||0,episodesWatched:0,done:false,note:''}));
+].map((r,i)=>({id:'mcu-'+String(i+1).padStart(3,'0'),order:i+1,phase:r[0],type:r[1],title:r[2],year:r[3],runtimeMin:r[4],imdbUrl:r[5]||'',episodesTotal:r[6]||0,episodesWatched:0,done:false,note:'',watching:false}));
 
 let data = load();
 let editingId = null;
@@ -110,6 +110,7 @@ function normalizeItem(item){
   item.episodesWatched = Math.max(0, Number(item.episodesWatched)||0);
   item.episodesTotal = Math.max(0, Number(item.episodesTotal)||0);
   item.runtimeMin = Math.max(0, Number(item.runtimeMin)||0);
+  item.watching = Boolean(item.watching);
   return item;
 }
 function load(){
@@ -129,9 +130,10 @@ function fmtMin(min){
   return h ? `${h} h ${m} min` : `${m} min`;
 }
 function fmtPercent(value){ return `${value.toFixed(2).replace('.', ',')}%`; }
+function fmtNumber(n){ return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
 function status(item){
   if(item.done) return 'done';
-  if(item.type === 'series' && item.episodesWatched > 0) return 'started';
+  if(item.watching || (item.type === 'series' && item.episodesWatched > 0)) return 'started';
   return 'open';
 }
 function renderPhaseOptions(){
@@ -155,8 +157,8 @@ function renderDashboard(){
     <div class="stat"><b>${openMovies}</b><span>Filme noch</span></div>
     <div class="stat"><b>${openSeries}</b><span>Serien/Staffeln noch</span></div>
     <div class="stat"><b>${openSpecials}</b><span>Specials noch</span></div>
-    <div class="stat"><b>${fmtMin(watched)} / ${fmtMin(total)}</b><span>gesehen / gesamt</span></div>
-    <div class="stat wide"><b>${fmtMin(rest)}</b><span>bekannte Restlaufzeit</span></div>`;
+    <div class="stat"><b>${fmtNumber(watched)} / ${fmtNumber(total)}</b><span>Minuten gesehen / gesamt</span></div>
+    <div class="stat wide"><b>${fmtNumber(rest)}</b><span>Minuten bekannte Restlaufzeit</span></div>`;
 }
 function filtered(){
   const q = $('#searchInput').value.trim().toLowerCase();
@@ -195,15 +197,16 @@ function renderItem(item){
       <div class="progress"><div class="bar" style="width:${Math.max(0, Math.min(100, pct))}%"></div></div>
       ${seriesControls}
       ${item.note ? `<p class="note">${escapeHtml(item.note)}</p>`:''}`;
-  return `<article class="entry ${item.done ? 'done':''} ${isDoneCollapsed ? 'compact-done':''}">
+  const clickableAttrs = item.done ? `data-done-expand="${item.id}" title="Zum Auf-/Einklappen klicken"` : '';
+  return `<article class="entry ${item.done ? 'done':''} ${item.watching ? 'watching':''} ${isDoneCollapsed ? 'compact-done':''}">
     <div class="entry-head">
-      <div class="num">${item.order}</div>
+      <div class="num clickable" ${clickableAttrs}>${item.order}</div>
       <div>
-        <div class="title-row"><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${escapeHtml(item.year)}</span>${item.done ? '<span class="badge done-badge">fertig</span>' : ''}</div>
+        <div class="title-row clickable" ${clickableAttrs}><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${escapeHtml(item.year)}</span>${item.watching && !item.done ? '<span class="badge watching-badge">gerade</span>' : ''}${item.done ? '<span class="badge done-badge">fertig</span>' : ''}</div>
         ${body}
       </div>
       <div class="controls">
-        ${item.done ? `<button class="small ghost" data-done-expand="${item.id}">${isDoneCollapsed ? 'Aufklappen' : 'Einklappen'}</button>` : ''}
+        <button class="small ghost" data-watch="${item.id}">${item.watching && !item.done ? 'Nicht gerade' : 'Gerade schauen'}</button>
         <button class="small" data-toggle="${item.id}">${item.done?'Öffnen':'Fertig'}</button>
         <button class="small ghost" data-edit="${item.id}">Bearbeiten</button>
       </div>
@@ -221,6 +224,7 @@ list.addEventListener('click', e => {
   const edit = e.target.closest('[data-edit]');
   const inc = e.target.closest('[data-ep-inc]');
   const doneExpand = e.target.closest('[data-done-expand]');
+  const watch = e.target.closest('[data-watch]');
   if(phaseToggle){
     const phase = phaseToggle.dataset.phaseToggle;
     collapsedPhases.has(phase) ? collapsedPhases.delete(phase) : collapsedPhases.add(phase);
@@ -231,10 +235,16 @@ list.addEventListener('click', e => {
     expandedDone.has(id) ? expandedDone.delete(id) : expandedDone.add(id);
     rememberUiState(); render(); return;
   }
+  if(watch){
+    const item = data.find(i=>i.id===watch.dataset.watch);
+    if(item && !item.done){ item.watching = !item.watching; save(); render(); }
+    return;
+  }
   if(toggle){
     const item = data.find(i=>i.id===toggle.dataset.toggle);
     item.done = !item.done;
     if(item.done){
+      item.watching = false;
       if(item.type==='series') item.episodesWatched = item.episodesTotal;
       expandedDone.delete(item.id);
     } else {
@@ -251,7 +261,7 @@ function changeEpisode(id, delta){
   const max = Number(item.episodesTotal)||999;
   item.episodesWatched = Math.max(0, Math.min(max, (Number(item.episodesWatched)||0) + delta));
   item.done = item.episodesTotal > 0 && item.episodesWatched >= item.episodesTotal;
-  if(item.done) expandedDone.delete(item.id);
+  if(item.done){ item.watching = false; expandedDone.delete(item.id); }
   save(); rememberUiState(); render();
 }
 function openEdit(id){
