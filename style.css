@@ -24,3 +24,48 @@
 .watching-badge{border-color:rgba(240,179,79,.5);color:#ffe0a3;background:rgba(240,179,79,.13)}
 .compact-done .controls .small.ghost[data-watch]{display:none}
 @media(max-width:620px){.app-header{grid-template-columns:1fr auto}.header-progress{grid-column:2;grid-row:1}.header-actions{grid-column:1/-1;grid-row:2;justify-content:flex-start}.backup-panel{left:0;right:auto}}
+
+.clickable{cursor:pointer}.open-badge{border-color:rgba(255,255,255,.18);color:var(--muted)}.watching-badge{border-color:rgba(240,179,79,.45);color:#ffd48a;background:rgba(240,179,79,.12)}.compact-done .entry-head{grid-template-columns:auto 1fr}.compact-done .title-row{margin-top:.05rem}
+
+
+/* Version 12: Prozent rechts oben, Backup unter Version */
+.app-header{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:flex-start !important;
+  gap:1rem !important;
+}
+.header-actions{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  gap:.55rem !important;
+  grid-column:auto !important;
+  grid-row:auto !important;
+  margin-left:auto !important;
+}
+.header-progress{
+  grid-column:auto !important;
+  grid-row:auto !important;
+  justify-self:auto !important;
+  align-self:flex-start !important;
+  min-width:5.8rem;
+  text-align:center;
+}
+.backup-under-version{
+  margin-top:.45rem;
+  width:max-content;
+}
+.backup-under-version summary{
+  padding:.46rem .65rem;
+  font-size:.84rem;
+}
+.backup-under-version .backup-panel{
+  left:0;
+  right:auto;
+}
+@media(max-width:620px){
+  .app-header{display:flex !important;align-items:flex-start !important;}
+  .header-actions{grid-column:auto !important;grid-row:auto !important;justify-content:flex-end !important;}
+  .backup-under-version .backup-panel{left:0;right:auto;}
+}

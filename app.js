@@ -198,18 +198,20 @@ function renderItem(item){
       ${seriesControls}
       ${item.note ? `<p class="note">${escapeHtml(item.note)}</p>`:''}`;
   const clickableAttrs = item.done ? `data-done-expand="${item.id}" title="Zum Auf-/Einklappen klicken"` : '';
+  const statusBadge = item.done ? '<span class="badge done-badge">fertig</span>' : (item.watching ? '<span class="badge watching-badge">gerade</span>' : '<span class="badge open-badge">offen</span>');
+  const controls = isDoneCollapsed ? '' : `<div class="controls">
+        <button class="small ghost" data-watch="${item.id}">${item.watching && !item.done ? 'Nicht gerade' : 'Gerade schauen'}</button>
+        <button class="small" data-toggle="${item.id}">${item.done?'Einklappen':'Fertig'}</button>
+        <button class="small ghost" data-edit="${item.id}">Bearbeiten</button>
+      </div>`;
   return `<article class="entry ${item.done ? 'done':''} ${item.watching ? 'watching':''} ${isDoneCollapsed ? 'compact-done':''}">
     <div class="entry-head">
       <div class="num clickable" ${clickableAttrs}>${item.order}</div>
       <div>
-        <div class="title-row clickable" ${clickableAttrs}><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${escapeHtml(item.year)}</span>${item.watching && !item.done ? '<span class="badge watching-badge">gerade</span>' : ''}${item.done ? '<span class="badge done-badge">fertig</span>' : ''}</div>
+        <div class="title-row clickable" ${clickableAttrs}><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${escapeHtml(item.year)}</span>${statusBadge}</div>
         ${body}
       </div>
-      <div class="controls">
-        <button class="small ghost" data-watch="${item.id}">${item.watching && !item.done ? 'Nicht gerade' : 'Gerade schauen'}</button>
-        <button class="small" data-toggle="${item.id}">${item.done?'Öffnen':'Fertig'}</button>
-        <button class="small ghost" data-edit="${item.id}">Bearbeiten</button>
-      </div>
+      ${controls}
     </div>
   </article>`;
 }
