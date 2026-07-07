@@ -13,9 +13,20 @@
     <div>
       <p class="eyebrow">PWA · MCU Watch Order</p>
       <h1>Marvel Tracker</h1>
-      <p class="version">Version 8</p>
+      <p class="version">Version 9</p>
     </div>
-    <div class="header-actions"><div id="headerProgress" class="header-progress">0%</div><button id="installBtn" class="ghost hidden">Installieren</button></div>
+    <div class="header-actions">
+      <div id="headerProgress" class="header-progress">0,00%</div>
+      <details class="backup-menu">
+        <summary>Backup</summary>
+        <div class="backup-panel">
+          <button id="exportBtn" type="button">Backup exportieren</button>
+          <label class="file-label">Backup importieren<input id="importInput" type="file" accept="application/json"></label>
+          <button id="resetSeedBtn" type="button" class="danger ghost">Seed-Daten neu laden</button>
+        </div>
+      </details>
+      <button id="installBtn" class="ghost hidden">Installieren</button>
+    </div>
   </header>
 
   <main>
@@ -25,8 +36,9 @@
       <input id="searchInput" type="search" placeholder="Suchen: Iron Man, Phase 4, Daredevil...">
       <select id="typeFilter">
         <option value="all">Alle Typen</option>
-        <option value="movie">Filme/Specials</option>
+        <option value="movie">Filme</option>
         <option value="series">Serien</option>
+        <option value="special">Specials</option>
       </select>
       <select id="statusFilter">
         <option value="all">Alle Status</option>
@@ -36,12 +48,6 @@
       </select>
       <select id="phaseFilter"><option value="all">Alle Phasen</option></select>
       <button id="resetFilters" class="ghost">Filter zurücksetzen</button>
-    </section>
-
-    <section class="actions card">
-      <button id="exportBtn">Backup exportieren</button>
-      <label class="file-label">Backup importieren<input id="importInput" type="file" accept="application/json"></label>
-      <button id="resetSeedBtn" class="danger ghost">Seed-Daten neu laden</button>
     </section>
 
     <section id="list" class="list"></section>
@@ -54,7 +60,7 @@
         <label>Titel<input name="title" required></label>
         <label>Jahr/Start<input name="year"></label>
         <label>Phase<input name="phase"></label>
-        <label>Typ<select name="type"><option value="movie">Film/Special</option><option value="series">Serie</option></select></label>
+        <label>Typ<select name="type"><option value="movie">Film</option><option value="series">Serie</option><option value="special">Special</option></select></label>
         <label>Laufzeit Minuten <input name="runtimeMin" type="number" min="0" step="1"></label>
         <label>Folgen gesamt <input name="episodesTotal" type="number" min="0" step="1"></label>
         <label>Folgen gesehen <input name="episodesWatched" type="number" min="0" step="1"></label>

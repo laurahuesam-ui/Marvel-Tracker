@@ -95,9 +95,15 @@ const seedItems = [
 
 let data = load();
 let editingId = null;
+const collapsedPhases = new Set(JSON.parse(localStorage.getItem('marvelTrackerCollapsedPhases.v1') || '[]'));
+const expandedDone = new Set(JSON.parse(localStorage.getItem('marvelTrackerExpandedDone.v1') || '[]'));
 const $ = sel => document.querySelector(sel);
 const list = $('#list');
 
+function rememberUiState(){
+  localStorage.setItem('marvelTrackerCollapsedPhases.v1', JSON.stringify([...collapsedPhases]));
+  localStorage.setItem('marvelTrackerExpandedDone.v1', JSON.stringify([...expandedDone]));
+}
 function normalizeItem(item){
   if(!item) return item;
   if(item.title === 'Werewolf by Night' || item.title === 'Guardians of the Galaxy Holiday Special' || item.title === 'The Punisher: One Last Kill') item.type = 'special';
@@ -122,16 +128,19 @@ function fmtMin(min){
   const h = Math.floor(min / 60), m = min % 60;
   return h ? `${h} h ${m} min` : `${m} min`;
 }
+function fmtPercent(value){ return `${value.toFixed(2).replace('.', ',')}%`; }
 function status(item){
   if(item.done) return 'done';
   if(item.type === 'series' && item.episodesWatched > 0) return 'started';
   return 'open';
 }
 function renderPhaseOptions(){
+  const current = $('#phaseFilter').value || 'all';
   const phases = [...new Set(data.map(i=>i.phase))];
   $('#phaseFilter').innerHTML = '<option value="all">Alle Phasen</option>' + phases.map(p=>`<option>${p}</option>`).join('');
+  $('#phaseFilter').value = phases.includes(current) ? current : 'all';
 }
-function renderDashboard(items=data){
+function renderDashboard(){
   const known = data.filter(i=>totalMinutes(i)>0);
   const total = known.reduce((s,i)=>s+totalMinutes(i),0);
   const watched = data.reduce((s,i)=>s+watchedMinutes(i),0);
@@ -139,14 +148,15 @@ function renderDashboard(items=data){
   const openMovies = data.filter(i=>i.type==='movie' && !i.done).length;
   const openSpecials = data.filter(i=>i.type==='special' && !i.done).length;
   const openSeries = data.filter(i=>i.type==='series' && !i.done).length;
-  const percent = total ? Math.round(watched/total*100) : 0;
+  const percent = total ? watched/total*100 : 0;
   const headerProgress = $('#headerProgress');
-  if(headerProgress) headerProgress.textContent = `${percent}%`;
+  if(headerProgress) headerProgress.textContent = fmtPercent(percent);
   $('#dashboard').innerHTML = `
     <div class="stat"><b>${openMovies}</b><span>Filme noch</span></div>
     <div class="stat"><b>${openSeries}</b><span>Serien/Staffeln noch</span></div>
     <div class="stat"><b>${openSpecials}</b><span>Specials noch</span></div>
-    <div class="stat"><b>${fmtMin(rest)}</b><span>bekannte Restlaufzeit</span></div>`;
+    <div class="stat"><b>${fmtMin(watched)} / ${fmtMin(total)}</b><span>gesehen / gesamt</span></div>
+    <div class="stat wide"><b>${fmtMin(rest)}</b><span>bekannte Restlaufzeit</span></div>`;
 }
 function filtered(){
   const q = $('#searchInput').value.trim().toLowerCase();
@@ -158,30 +168,47 @@ function filtered(){
 function render(){
   renderDashboard();
   const items = filtered();
-  let lastPhase = '';
-  list.innerHTML = items.map(item => {
-    const phase = item.phase !== lastPhase ? `<h2 class="phase-title">${item.phase}</h2>` : '';
-    lastPhase = item.phase;
-    const total = totalMinutes(item), watched = watchedMinutes(item);
-    const pct = total ? Math.round(watched/total*100) : (item.done ? 100 : 0);
-    const seriesControls = item.type === 'series' ? `<div class="episode-row"><span class="badge">Folgen</span><strong>${item.episodesWatched}</strong><span>/ ${item.episodesTotal || '?'} · ca. ${item.runtimeMin || '?'} min/Folge</span><button class="episode-btn" data-ep-inc="${item.id}">+1 Folge</button></div>` : '';
-    return `${phase}<article class="entry ${item.done ? 'done':''}">
-      <div class="entry-head">
-        <div class="num">${item.order}</div>
-        <div>
-          <div class="title-row"><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${item.year}</span></div>
-          <p class="meta">${total ? `${fmtMin(total)} gesamt · ${fmtMin(Math.max(0,total-watched))} offen · ${pct}%` : 'Laufzeit/Folgen noch unbekannt'} ${item.imdbUrl ? `· <a href="${item.imdbUrl}" target="_blank" rel="noopener">IMDb</a>`:''}</p>
-          <div class="progress"><div class="bar" style="width:${pct}%"></div></div>
-          ${seriesControls}
-          ${item.note ? `<p class="note">${escapeHtml(item.note)}</p>`:''}
-        </div>
-        <div class="controls">
-          <button class="small" data-toggle="${item.id}">${item.done?'Öffnen':'Fertig'}</button>
-          <button class="small ghost" data-edit="${item.id}">Bearbeiten</button>
-        </div>
+  const groups = [];
+  for(const item of items){
+    let group = groups[groups.length-1];
+    if(!group || group.phase !== item.phase){ group = {phase:item.phase, items:[]}; groups.push(group); }
+    group.items.push(item);
+  }
+  list.innerHTML = groups.map(group => {
+    const isCollapsed = collapsedPhases.has(group.phase);
+    const doneCount = group.items.filter(i=>i.done).length;
+    const phaseHtml = `<button class="phase-toggle" data-phase-toggle="${escapeHtml(group.phase)}">
+      <span>${isCollapsed ? '▸' : '▾'} ${escapeHtml(group.phase)}</span>
+      <small>${group.items.length} Titel · ${doneCount} fertig</small>
+    </button>`;
+    const itemHtml = isCollapsed ? '' : group.items.map(renderItem).join('');
+    return `<section class="phase-group">${phaseHtml}<div class="phase-items">${itemHtml}</div></section>`;
+  }).join('') || '<p class="card empty">Keine Einträge gefunden.</p>';
+}
+function renderItem(item){
+  const total = totalMinutes(item), watched = watchedMinutes(item);
+  const pct = total ? watched/total*100 : (item.done ? 100 : 0);
+  const isDoneCollapsed = item.done && !expandedDone.has(item.id);
+  const seriesControls = item.type === 'series' && !isDoneCollapsed ? `<div class="episode-row"><span class="badge">Folgen</span><strong>${item.episodesWatched}</strong><span>/ ${item.episodesTotal || '?'} · ca. ${item.runtimeMin || '?'} min/Folge</span><button class="episode-btn" data-ep-inc="${item.id}">+1 Folge</button></div>` : '';
+  const body = isDoneCollapsed ? '' : `
+      <p class="meta">${total ? `${fmtMin(total)} gesamt · ${fmtMin(Math.max(0,total-watched))} offen · ${fmtPercent(pct)}` : 'Laufzeit/Folgen noch unbekannt'} ${item.imdbUrl ? `· <a href="${item.imdbUrl}" target="_blank" rel="noopener">IMDb</a>`:''}</p>
+      <div class="progress"><div class="bar" style="width:${Math.max(0, Math.min(100, pct))}%"></div></div>
+      ${seriesControls}
+      ${item.note ? `<p class="note">${escapeHtml(item.note)}</p>`:''}`;
+  return `<article class="entry ${item.done ? 'done':''} ${isDoneCollapsed ? 'compact-done':''}">
+    <div class="entry-head">
+      <div class="num">${item.order}</div>
+      <div>
+        <div class="title-row"><h3>${escapeHtml(item.title)}</h3><span class="badge">${typeLabel(item.type)}</span><span class="badge">${escapeHtml(item.year)}</span>${item.done ? '<span class="badge done-badge">fertig</span>' : ''}</div>
+        ${body}
       </div>
-    </article>`;
-  }).join('') || '<p class="card" style="padding:1rem">Keine Einträge gefunden.</p>';
+      <div class="controls">
+        ${item.done ? `<button class="small ghost" data-done-expand="${item.id}">${isDoneCollapsed ? 'Aufklappen' : 'Einklappen'}</button>` : ''}
+        <button class="small" data-toggle="${item.id}">${item.done?'Öffnen':'Fertig'}</button>
+        <button class="small ghost" data-edit="${item.id}">Bearbeiten</button>
+      </div>
+    </div>
+  </article>`;
 }
 function typeLabel(type){ return type === 'series' ? 'Serie' : (type === 'special' ? 'Special' : 'Film'); }
 function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
@@ -189,13 +216,33 @@ function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g, c => ({'&
 ['searchInput','typeFilter','statusFilter','phaseFilter'].forEach(id => $('#'+id).addEventListener('input', render));
 $('#resetFilters').onclick = () => { $('#searchInput').value=''; $('#typeFilter').value='all'; $('#statusFilter').value='all'; $('#phaseFilter').value='all'; render(); };
 list.addEventListener('click', e => {
+  const phaseToggle = e.target.closest('[data-phase-toggle]');
   const toggle = e.target.closest('[data-toggle]');
   const edit = e.target.closest('[data-edit]');
   const inc = e.target.closest('[data-ep-inc]');
-  const dec = e.target.closest('[data-ep-dec]');
-  if(toggle){ const item = data.find(i=>i.id===toggle.dataset.toggle); item.done = !item.done; if(item.done && item.type==='series') item.episodesWatched = item.episodesTotal; save(); render(); }
+  const doneExpand = e.target.closest('[data-done-expand]');
+  if(phaseToggle){
+    const phase = phaseToggle.dataset.phaseToggle;
+    collapsedPhases.has(phase) ? collapsedPhases.delete(phase) : collapsedPhases.add(phase);
+    rememberUiState(); render(); return;
+  }
+  if(doneExpand){
+    const id = doneExpand.dataset.doneExpand;
+    expandedDone.has(id) ? expandedDone.delete(id) : expandedDone.add(id);
+    rememberUiState(); render(); return;
+  }
+  if(toggle){
+    const item = data.find(i=>i.id===toggle.dataset.toggle);
+    item.done = !item.done;
+    if(item.done){
+      if(item.type==='series') item.episodesWatched = item.episodesTotal;
+      expandedDone.delete(item.id);
+    } else {
+      expandedDone.add(item.id);
+    }
+    rememberUiState(); save(); render();
+  }
   if(inc){ changeEpisode(inc.dataset.epInc, 1); }
-  if(dec){ changeEpisode(dec.dataset.epDec, -1); }
   if(edit) openEdit(edit.dataset.edit);
 });
 function changeEpisode(id, delta){
@@ -204,8 +251,8 @@ function changeEpisode(id, delta){
   const max = Number(item.episodesTotal)||999;
   item.episodesWatched = Math.max(0, Math.min(max, (Number(item.episodesWatched)||0) + delta));
   item.done = item.episodesTotal > 0 && item.episodesWatched >= item.episodesTotal;
-  save();
-  render();
+  if(item.done) expandedDone.delete(item.id);
+  save(); rememberUiState(); render();
 }
 function openEdit(id){
   editingId = id;
@@ -230,7 +277,7 @@ $('#importInput').onchange = async e => {
   const file = e.target.files[0]; if(!file) return;
   const parsed = JSON.parse(await file.text()); data = (Array.isArray(parsed) ? parsed : parsed.data).map(normalizeItem); save(); renderPhaseOptions(); render(); e.target.value='';
 };
-$('#resetSeedBtn').onclick = () => { if(confirm('Seed-Daten neu laden? Dein Fortschritt wird überschrieben.')){ data = structuredClone(seedItems).map(normalizeItem); save(); renderPhaseOptions(); render(); } };
+$('#resetSeedBtn').onclick = () => { if(confirm('Seed-Daten neu laden? Dein Fortschritt wird überschrieben.')){ data = structuredClone(seedItems).map(normalizeItem); expandedDone.clear(); collapsedPhases.clear(); rememberUiState(); save(); renderPhaseOptions(); render(); } };
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; $('#installBtn').classList.remove('hidden'); });
 $('#installBtn').onclick = async () => { if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; $('#installBtn').classList.add('hidden'); } };
